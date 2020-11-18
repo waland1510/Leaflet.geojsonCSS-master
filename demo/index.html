@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru-RU">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Leaflet.geojsonCSS demo</title>
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+
+	<script src="https://yandex.st/jquery/2.0.3/jquery.min.js"></script>
+	<script src="https://cdn.leafletjs.com/leaflet-0.7.3/leaflet-src.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+	<script>
+	$.ajaxSetup({ dataType: 'json' });
+	</script>
+	<style>
+	html, body {
+		height: 100%;
+		margin: 0;
+		padding: 10px 0;
+		}
+
+	/* .column {
+		position: relative;
+		float: left;
+		width: 90%;
+		height: 100%;
+		margin: 0 3%;
+		}
+
+	.header {
+		position: absolute;
+		z-index: 10000;
+		width: 100%;
+		padding: 5px 10px;
+		font: 18px/1.4 "Lucida Console", Monaco, monospace;
+		background-color: rgba(0, 0, 0, 0.751998);
+		color: #FFF;
+		} */
+
+	.map {
+		height: 100%;
+		}
+
+	/* .map .leaflet-tile-pane {
+		-webkit-filter: grayscale(100%);
+		   -moz-filter: grayscale(100%);
+		    -ms-filter: grayscale(100%);
+		     -o-filter: grayscale(100%);
+		        filter: grayscale(100%);
+		} */
+	</style>
+</head>
+<body>
+
+		<div class="map"></div>
+
+	<script>
+	$([0, 1]).each(function(idx) {
+		var container = $('.map').eq(idx).get(0);
+		var map = L.map(container, {
+			center: [43.7, -79.391775],
+			zoom: 11.5,
+			zoomControl: false,
+			attributionControl: false
+		});
+
+		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+	}).addTo(map);
+	function onEachFeature(feature, layer) {
+		var popupContent = "<h3>" +
+				feature.properties.CFSAUID + "</h3>";
+		if (feature.properties.CFSAUID && feature.properties.popupContent) {
+			popupContent += feature.properties.popupContent;
+		}
+
+		layer.bindPopup(popupContent);
+	}
+		$.get('Toronto2.geojson', function(json) {
+			
+				L.geoJson(json, {
+
+				style: function (feature) {
+					return feature.properties && feature.properties.style;
+				},
+
+				onEachFeature: onEachFeature,
+
+				pointToLayer: function (feature, latlng) {
+					return L.circleMarker(latlng, {
+						radius: 8,
+						fillColor: "#ff7800",
+						color: "#000",
+						weight: 1,
+						opacity: 1,
+						fillOpacity: 0.8
+					});
+				}
+				}).addTo(map);
+		});
+	});
+	</script>
+
+</body>
+</html>
